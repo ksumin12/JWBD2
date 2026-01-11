@@ -16,13 +16,11 @@
     --text: #111;
     --bubble-gray: #E9E9EB;
 
-    --tail-size: 16px;
-    --tail-out: 6px;
-    --tail-bottom: 0px;
-
-    --tail-notch: 10px;  /* 파인 느낌(노치) 크기 */
-    --tail-notch-out: 2px; /* 노치가 밖으로 나가는 정도 */
-
+    /* ✅ iMessage 꼬리 튜닝 값 */
+    --tail-size: 18px;      /* 꼬리(사각 베이스) 크기 */
+    --tail-out: 7px;        /* 말풍선 밖으로 나가는 정도 */
+    --tail-bottom: 0px;     /* 꼬리 바닥 위치 */
+    --tail-notch-out: 3px;  /* 파인 노치가 더 바깥으로 밀리는 정도 */
   }
 
   *{ box-sizing: border-box; }
@@ -210,7 +208,7 @@
     overflow-wrap: break-word;
 
     position: relative;
-    overflow: visible;
+    overflow: visible;   /* ✅ 꼬리가 밖으로 나와야 해서 visible */
     isolation: isolate;
   }
   .row.other .bubble{
@@ -227,7 +225,6 @@
     color: #111;
     border-bottom-left-radius: 6px;
   }  
-
 
   /* stack for my bubble +  */
   .stack{
@@ -345,36 +342,59 @@
     opacity: 0.55;
     cursor: not-allowed;
   }
- 
 
-  /* iMessage tail (clip-path) */
+  /* ✅ iMessage 스타일 꼬리 (색 꼬리 + 배경으로 파내는 노치) */
+  .bubble.me::before{
+    content:"";
+    position:absolute;
+    right: calc(-1 * var(--tail-out));
+    bottom: var(--tail-bottom);
+    width: var(--tail-size);
+    height: var(--tail-size);
+    background: var(--ios-blue);
+    pointer-events:none;
+
+    /* 오른쪽 말풍선: 꼬리의 안쪽(왼쪽 아래)만 둥글게 */
+    border-radius: 0 0 0 var(--tail-size);
+  }
   .bubble.me::after{
     content:"";
     position:absolute;
-    right:-8px;
-    bottom:-5px;
-    width:18px;
-    height:18px;
-    background: var(--ios-blue);
+    right: calc(-1 * (var(--tail-out) + var(--tail-notch-out)));
+    bottom: var(--tail-bottom);
+    width: var(--tail-size);
+    height: var(--tail-size);
+    background: var(--bg);
     pointer-events:none;
-  
-    /* ✅ 아래로 떨어지는 꼬리 모양 */
-    clip-path: path("M 2 4 C 7 1, 13 2, 16 6 C 18 10, 16 14, 12 16 C 9 18, 4 16, 3 12 C 2 9, 1 6, 2 4 Z");
+
+    /* 같은 라운드로 겹쳐서 "파인" 느낌 만들기 */
+    border-radius: 0 0 0 var(--tail-size);
   }
-  
+
+  .bubble.other::before{
+    content:"";
+    position:absolute;
+    left: calc(-1 * var(--tail-out));
+    bottom: var(--tail-bottom);
+    width: var(--tail-size);
+    height: var(--tail-size);
+    background: var(--bubble-gray);
+    pointer-events:none;
+
+    /* 왼쪽 말풍선: 꼬리의 안쪽(오른쪽 아래)만 둥글게 */
+    border-radius: 0 0 var(--tail-size) 0;
+  }
   .bubble.other::after{
     content:"";
     position:absolute;
-    left:-8px;
-    bottom:-2px;
-    width:18px;
-    height:18px;
-    background: var(--bubble-gray);
+    left: calc(-1 * (var(--tail-out) + var(--tail-notch-out)));
+    bottom: var(--tail-bottom);
+    width: var(--tail-size);
+    height: var(--tail-size);
+    background: var(--bg);
     pointer-events:none;
-  
-    /* 좌우 반전: 같은 path 쓰고 뒤집기 */
-    clip-path: path("M 2 4 C 7 1, 13 2, 16 6 C 18 10, 16 14, 12 16 C 9 18, 4 16, 3 12 C 2 9, 1 6, 2 4 Z");
-    transform: scaleX(-1);
+
+    border-radius: 0 0 var(--tail-size) 0;
   }
 
   @media (max-width: 480px){
@@ -383,7 +403,6 @@
     .chat-app{ max-width: 100%; }
   }
 </style>
-
 </head>
 
 <body>
@@ -652,23 +671,4 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
