@@ -36,72 +36,29 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-    /* Intro */
-    /* ✅ Intro wavy + subtle color */
-#intro{
-  position: fixed;
-  inset: 0;
-  background: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  z-index: 10;
-}
+   /* Intro */
+    #intro{
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      color: #444;
+      font-size: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+      animation: pop 1.5s infinite ease-in-out;
+      z-index: 10;
+      white-space: pre-line;
+      line-height: 1.8;
+    }
+    @keyframes pop{
+      0%, 100%{ transform: scale(1); }
+      50%{ transform: scale(1.05); }
+    }
 
-/* 은은한 그라데이션 텍스트(살짝 색) */
-.intro-title{
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-
-  /* ✅ 색 “살짝” */
-  background: linear-gradient(
-    90deg,
-    rgba(0,122,255,0.85),
-    rgba(175,82,222,0.75),
-    rgba(0,122,255,0.85)
-  );
-  background-size: 200% 100%;
-  animation: introShimmer 2.8s linear infinite;
-}
-
-/* 글자 단위 물결 */
-.intro-title .wave-char{
-  display: inline-block;
-
-  /* ✅ 부모 그라데이션을 글자에 적용 */
-  background: inherit;
-  background-size: inherit;
-  background-position: inherit;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-
-  animation: introWave 1.2s ease-in-out infinite;
-  animation-delay: calc(var(--i) * 60ms);
-  will-change: transform;
-}
-
-@keyframes introWave{
-  0%, 100%{ transform: translateY(0); opacity: 0.95; }
-  35%{ transform: translateY(-4px); opacity: 1; }
-  70%{ transform: translateY(1px); opacity: 0.95; }
-}
-
-@keyframes introShimmer{
-  0%{ background-position: 0% 50%; }
-  100%{ background-position: 200% 50%; }
-}
-
-/* 모션 줄이기 설정 */
-@media (prefers-reduced-motion: reduce){
-  .intro-title{ animation: none; }
-  .intro-title .wave-char{ animation: none; }
-}
-
-
+    
     /* App shell */
     .chat-app{
       display: none;
@@ -122,8 +79,9 @@
       border-bottom: 1px solid var(--line);
 
       padding-top: env(safe-area-inset-top);
-      height: calc(56px + env(safe-area-inset-top));
-
+      padding-bottom: 6px; 
+      min-height: calc(56px + env(safe-area-inset-top));
+      height: auto; 
       display: grid;
       grid-template-columns: 56px 1fr 56px;
       align-items: center;
@@ -148,13 +106,13 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 4px;
+      gap: 2px;
       min-width: 0;
       transform: translateY(1px);
     }
     .nav-avatar{
-      width: 35px;
-      height: 35px;
+      width: 38px;
+      height: 38px;
       border-radius: 50%;
       overflow: hidden;
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
@@ -518,22 +476,6 @@
   </div>
 
   <script>
-    function makeIntroWavy(){
-      const title = document.getElementById("introTitle");
-      if (!title) return;
-    
-      const text = title.textContent;
-      title.textContent = "";
-    
-      [...text].forEach((ch, i) => {
-        const span = document.createElement("span");
-        span.className = "wave-char";
-        span.style.setProperty("--i", i);
-        span.textContent = (ch === " ") ? "\u00A0" : ch;
-        title.appendChild(span);
-      });
-    }
-
     const TRIGGERS = [
       {
         keywords: ["축하"],
@@ -696,7 +638,6 @@
 
     // Intro -> show app
     window.onload = () => {
-      makeIntroWavy();
       setTimeout(() => {
         document.getElementById("intro").style.display = "none";
         document.getElementById("chatApp").style.display = "flex";
@@ -732,6 +673,7 @@
   </script>
 </body>
 </html>
+
 
 
 
