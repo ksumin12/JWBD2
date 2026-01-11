@@ -368,13 +368,23 @@
         }
         
         // 날짜 구분선 세팅
-        function setDaySeparator() {
-          const now = new Date();
-          const yy = now.getFullYear();
-          const mm = String(now.getMonth() + 1).padStart(2, "0");
-          const dd = String(now.getDate()).padStart(2, "0");
-          daySep.textContent = `${yy}.${mm}.${dd}`;
+       function setDaySeparator(date = new Date()) {
+        daySep.textContent = formatKoreanDateTime(date);
+      }
+        function formatKoreanDateTime(date) {
+          const days = ["일", "월", "화", "수", "목", "금", "토"];
+          const month = date.getMonth() + 1;
+          const day = date.getDate();
+          const dow = days[date.getDay()];
+        
+          const h = date.getHours();
+          const m = String(date.getMinutes()).padStart(2, "0");
+          const ampm = h < 12 ? "오전" : "오후";
+          const hh = (h % 12) === 0 ? 12 : (h % 12);
+        
+          return `${month}월 ${day}일 (${dow}) ${ampm} ${hh}:${m}`;
         }
+
         
         // 시간 포맷 (오전/오후)
         function formatTime(date) {
@@ -398,12 +408,7 @@
           const bubble = document.createElement("div");
           bubble.className = "bubble me";
           bubble.textContent = text;
-        
-          const meta = document.createElement("div");
-          meta.className = "meta";
-          meta.textContent = formatTime(new Date());
-        
-          row.appendChild(meta);
+    
           row.appendChild(bubble);
           messageList.appendChild(row);
           scrollToBottom();
@@ -478,7 +483,7 @@
           input.value = "";
           updateSendBtn();
 
-          input.blur();
+          document.activeElement?.blur();
 
         
           // 트리거 포함 시 랜덤 답장
@@ -498,5 +503,6 @@
     </script>
 </body>
 </html>
+
 
 
