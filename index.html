@@ -233,19 +233,14 @@
       transform: skewX(18deg);
     }
 
-    /* stack for my bubble + delivered */
+    /* stack for my bubble +  */
     .stack{
       display: flex;
       flex-direction: column;
       align-items: flex-end;
       gap: 4px;
     }
-    .delivered{
-      font-size: 11px;
-      color: rgba(0,0,0,0.35);
-      margin-right: 6px;
-      user-select: none;
-    }
+
 
     /* Typing indicator */
     .typing{
@@ -544,12 +539,8 @@
       bubble.className = "bubble me";
       bubble.textContent = text;
 
-      const delivered = document.createElement("div");
-      delivered.className = "delivered";
-      delivered.textContent = "전송됨";
 
       stack.appendChild(bubble);
-      stack.appendChild(delivered);
 
       row.appendChild(stack);
       messageList.appendChild(row);
@@ -647,3 +638,4 @@
   </script>
 </body>
 </html>
+
