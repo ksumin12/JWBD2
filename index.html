@@ -19,6 +19,10 @@
     --tail-size: 16px;
     --tail-out: 6px;
     --tail-bottom: 0px;
+
+    --tail-notch: 10px;  /* 파인 느낌(노치) 크기 */
+    --tail-notch-out: 2px; /* 노치가 밖으로 나가는 정도 */
+
   }
 
   *{ box-sizing: border-box; }
@@ -207,6 +211,7 @@
 
     position: relative;
     overflow: visible;
+    isolation: isolate;
   }
   .row.other .bubble{
     max-width: min(78%, 380px);
@@ -342,20 +347,21 @@
   }
 
   /* 오른쪽(내 말풍선) 꼬리 */
-.bubble.me::after{
+/* ✅ 파인 느낌(노치): 꼬리 위만 살짝 덮기 (본체는 안 건드리게 위치 조절) */
+.bubble.me::before{
   content:"";
   position:absolute;
-  right: calc(-1 * var(--tail-out));
-  bottom: var(--tail-bottom);
-  width: var(--tail-size);
-  height: var(--tail-size);
-  background: var(--ios-blue);
-  border-radius: 0 999px 999px 999px;
-  transform: rotate(-45deg);
+  right: calc(-1 * (var(--tail-out) + var(--tail-notch-out)));
+  bottom: calc(var(--tail-bottom) + 2px);
+  width: var(--tail-notch);
+  height: var(--tail-notch);
+  background: var(--bg);   /* ✅ 배경색 */
+  border-radius: 999px;
   pointer-events: none;
+  z-index: -1; /* 꼬리보다 위, 말풍선보단 뒤 */
 }
 
-/* 왼쪽(상대 말풍선) 꼬리 */
+/* 왼쪽(상대) */
 .bubble.other::after{
   content:"";
   position:absolute;
@@ -367,6 +373,20 @@
   border-radius: 999px 0 999px 999px;
   transform: rotate(45deg);
   pointer-events: none;
+  z-index: -2;
+}
+
+.bubble.other::before{
+  content:"";
+  position:absolute;
+  left: calc(-1 * (var(--tail-out) + var(--tail-notch-out)));
+  bottom: calc(var(--tail-bottom) + 2px);
+  width: var(--tail-notch);
+  height: var(--tail-notch);
+  background: var(--bg);
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: -1;
 }
 
 
@@ -648,6 +668,7 @@
   </script>
 </body>
 </html>
+
 
 
 
