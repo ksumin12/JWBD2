@@ -234,7 +234,7 @@
       --chat-bg: #fff;          /* 채팅 배경색이 흰색이면 그대로 */
       --tail: 16px;             /* 꼬리 원 크기 */
       --tail-out: 4px;          /* 밖으로 튀어나오는 정도 */
-      --tail-cut: 7px;         /* 파여 보이게 만드는 정도 */
+      --tail-cut: 8px;         /* 파여 보이게 만드는 정도 */
     }
     
     /* bubble은 position: relative; 가 이미 있어야 함(네 코드에 있음) */
@@ -242,7 +242,7 @@
     .bubble::after{
       content:"";
       position:absolute;
-      bottom: -3px;              /* 꼬리 높이(위/아래) */
+      bottom: -1px;              /* 꼬리 높이(위/아래) */
       width: var(--tail);
       height: var(--tail);
       border-radius: 999px;
@@ -671,6 +671,7 @@
   </script>
 </body>
 </html>
+
 
 
 
