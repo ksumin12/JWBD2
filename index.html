@@ -228,7 +228,7 @@
       border: none;
       outline: none;
       width: 100%;
-      font-size: 13px;
+      font-size: 16px;
       background: transparent;
     }
 
@@ -321,7 +321,7 @@
     window.onload = () => {
       setTimeout(() => {
         document.getElementById("intro").style.display = "none";
-        document.getElementById("chatApp").style.display = "block";
+        document.getElementById("chatApp").style.display = "flex";
         setDaySeparator();
         scrollToBottom();
       }, 3000);
@@ -474,6 +474,12 @@
         
           // 내 메시지 추가
           addMyMessage(text);
+
+          input.value = "";
+          updateSendBtn();
+
+          input.focus();
+
         
           // 트리거 포함 시 랜덤 답장
           const trigger = findTrigger(text);
@@ -492,3 +498,4 @@
     </script>
 </body>
 </html>
+
