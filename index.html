@@ -167,6 +167,9 @@
     }
     .row.me{ justify-content: flex-end; }
     .row.other{ justify-content: flex-start; }
+    .row.other .bubble{
+      max-width: min(78%, 380px);
+    }
 
     /* avatar (left messages) */
     .avatar{
@@ -186,13 +189,15 @@
 
     /* bubbles */
     .bubble{
+      display: inline-block; 
       max-width: min(78%, 380px);
       padding: 10px 12px;
       border-radius: 18px;
       font-size: 15px;
       line-height: 1.35;
-      word-wrap: break-word;
       white-space: pre-wrap;
+      word-break: keep-all;
+      overflow-wrap: break-word;
       position: relative;
     }
 
@@ -239,6 +244,8 @@
       flex-direction: column;
       align-items: flex-end;
       gap: 4px;
+      max-width: min(78%, 380px);
+
     }
 
 
@@ -276,7 +283,7 @@
       align-items: center;
       gap: 10px;
 
-      padding: 10px 12px;
+      padding: 8px 12px;
       padding-bottom: calc(10px + env(safe-area-inset-bottom));
 
       background: rgba(255,255,255,0.94);
@@ -381,7 +388,7 @@
         <div class="nav-avatar">
           <img src="https://i.imgur.com/Cudzc0A.jpeg" alt="avatar">
         </div>
-        <div class="nav-name">自由世界</div>
+        <div class="nav-name">재워니🩵</div>
       </div>
 
       <button class="nav-btn" type="button" aria-label="Video">
@@ -547,46 +554,37 @@
       scrollToBottom();
     }
 
-    function addJWMessage(replyText){
+    function addJWMessage(replyText) {
       const row = document.createElement("div");
       row.className = "row other";
-
-      const avatar = document.createElement("div");
-      avatar.className = "avatar";
-      avatar.innerHTML = `<img src="https://i.imgur.com/Cudzc0A.jpeg" alt="Nicholas">`;
-
+    
       const bubble = document.createElement("div");
       bubble.className = "bubble other";
       bubble.textContent = replyText;
-
-      row.appendChild(avatar);
+    
       row.appendChild(bubble);
-
       messageList.appendChild(row);
       scrollToBottom();
     }
+
 
     let typingEl = null;
 
-    function showTyping(){
+    function showTyping() {
       const row = document.createElement("div");
       row.className = "row other";
-
-      const avatar = document.createElement("div");
-      avatar.className = "avatar";
-      avatar.innerHTML = `<img src="https://i.imgur.com/Cudzc0A.jpeg" alt="Nicholas">`;
-
+    
       const typing = document.createElement("div");
       typing.className = "typing";
       typing.innerHTML = `<span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
-
-      row.appendChild(avatar);
+    
       row.appendChild(typing);
       messageList.appendChild(row);
-
+    
       typingEl = row;
       scrollToBottom();
     }
+
 
     function hideTyping(){
       if (typingEl) typingEl.remove();
@@ -638,4 +636,5 @@
   </script>
 </body>
 </html>
+
 
