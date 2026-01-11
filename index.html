@@ -230,32 +230,49 @@
       color: #111;
       border-bottom-left-radius: 6px;
     }
-
-    /* tiny “tail” 느낌 (간단 버전) */
+    :root{
+      --chat-bg: #fff;          /* 채팅 배경색이 흰색이면 그대로 */
+      --tail: 16px;             /* 꼬리 원 크기 */
+      --tail-out: 7px;          /* 밖으로 튀어나오는 정도 */
+      --tail-cut: 10px;         /* 파여 보이게 만드는 정도 */
+    }
+    
+    /* bubble은 position: relative; 가 이미 있어야 함(네 코드에 있음) */
+    .bubble::before,
+    .bubble::after{
+      content:"";
+      position:absolute;
+      bottom: 2px;              /* 꼬리 높이(위/아래) */
+      width: var(--tail);
+      height: var(--tail);
+      border-radius: 999px;
+      pointer-events: none;
+    }
+    
+    /* ===== 오른쪽(내 말풍선) 꼬리 ===== */
     .bubble.me::after{
-      content:"";
-      position:absolute;
-      right:-6px;
-      bottom:0;
-      width:12px;
-      height:12px;
+      right: calc(-1 * var(--tail-out));
       background: var(--ios-blue);
-      border-bottom-left-radius: 12px;
-      border-top-right-radius: 12px;
-      transform: skewX(-18deg);
+      z-index: 1;
     }
+    .bubble.me::before{
+      right: calc(-1 * (var(--tail-out) + var(--tail-cut)));
+      background: var(--chat-bg);   /* 배경색으로 파내기 */
+      z-index: 2;
+    }
+    
+    /* ===== 왼쪽(상대 말풍선) 꼬리 ===== */
     .bubble.other::after{
-      content:"";
-      position:absolute;
-      left:-6px;
-      bottom:0;
-      width:12px;
-      height:12px;
+      left: calc(-1 * var(--tail-out));
       background: var(--bubble-gray);
-      border-bottom-right-radius: 12px;
-      border-top-left-radius: 12px;
-      transform: skewX(18deg);
+      z-index: 1;
     }
+    .bubble.other::before{
+      left: calc(-1 * (var(--tail-out) + var(--tail-cut)));
+      background: var(--chat-bg);
+      z-index: 2;
+    }
+
 
     /* stack for my bubble +  */
     .stack{
@@ -654,6 +671,7 @@
   </script>
 </body>
 </html>
+
 
 
 
