@@ -1,0 +1,483 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>自由世界</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: #f2f2f7; /* iOS 느낌 배경 */
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      overflow: hidden;
+    }
+
+    /* Intro */
+    #intro {
+      position: fixed;
+      inset: 0;
+      background-color: #f2f2f7;
+      color: #444;
+      font-size: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+      animation: pop 1.5s infinite ease-in-out;
+      z-index: 10;
+      white-space: pre-line;
+      line-height: 1.8;
+    }
+    @keyframes pop {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* Chat Layout (iMessage style) */
+    .chat-app {
+      display: none;
+      height: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      background: #f2f2f7;
+    }
+
+    .chat-header {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(242, 242, 247, 0.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .chat-header .title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      line-height: 1.1;
+    }
+    .chat-header .title .name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #111;
+    }
+    .chat-header .title .status {
+      font-size: 11px;
+      color: rgba(0,0,0,0.5);
+    }
+
+    .message-list {
+      height: calc(100% - 56px - 70px);
+      overflow-y: auto;
+      padding: 14px 12px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      scroll-behavior: smooth;
+    }
+
+    .day-sep {
+      align-self: center;
+      font-size: 11px;
+      color: rgba(0,0,0,0.45);
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(0,0,0,0.06);
+      margin: 4px 0 8px;
+    }
+
+    .row {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      max-width: 100%;
+    }
+    .row.me { justify-content: flex-end; }
+    .row.other { justify-content: flex-start; }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      flex: 0 0 28px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .bubble {
+      max-width: min(78%, 380px);
+      padding: 10px 12px;
+      border-radius: 18px;
+      font-size: 13px;
+      line-height: 1.35;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+    }
+
+    /* iMessage 색감 */
+    .bubble.me {
+      background: #0b93f6; /* iMessage blue */
+      color: #fff;
+      border-bottom-right-radius: 6px;
+    }
+    .bubble.other {
+      background: #e5e5ea; /* iMessage gray */
+      color: #111;
+      border-bottom-left-radius: 6px;
+    }
+
+    .subtext {
+      margin-top: 6px;
+      font-size: 12px;
+      opacity: 0.75;
+    }
+    .bubble.me .subtext { opacity: 0.85; }
+
+    .meta {
+      font-size: 10px;
+      color: rgba(0,0,0,0.35);
+      margin: 0 6px;
+      user-select: none;
+    }
+    .row.me .meta { text-align: right; }
+
+    /* Typing indicator */
+    .typing {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: #e5e5ea;
+      border-bottom-left-radius: 6px;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.35);
+      animation: bounce 1s infinite ease-in-out;
+    }
+    .dot:nth-child(2) { animation-delay: 0.12s; }
+    .dot:nth-child(3) { animation-delay: 0.24s; }
+    @keyframes bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+      40% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    /* Input bar */
+    .chat-input {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-top: 1px solid rgba(0,0,0,0.06);
+      background: rgba(242, 242, 247, 0.92);
+      backdrop-filter: blur(10px);
+    }
+
+    .chat-input .field {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 22px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+    }
+
+    .chat-input input {
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 13px;
+      background: transparent;
+    }
+
+    .send-btn {
+      border: none;
+      background: #0b93f6;
+      color: #fff;
+      font-weight: 600;
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 18px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(11,147,246,0.22);
+    }
+    .send-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    @media (max-width: 480px) {
+      #intro { font-size: 11px; padding: 30px 20px; }
+      .bubble { font-size: 12.5px; }
+      .chat-app { max-width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="intro">
+    니콜라스에게 생일 축하 메세지를 남겨보세요!
+    어쩌면 천사의 답장을 받을 수도?
+    自由世界, 지금 접속 중 ...
+  </div>
+
+  <div class="chat-app" id="chatApp">
+    <div class="chat-header">
+      <div class="title">
+        <div class="name">自由世界</div>
+        <div class="status"> 재워니🩵 </div>
+      </div>
+    </div>
+
+    <div class="message-list" id="messageList">
+      <div class="day-sep" id="daySep"></div>
+    </div>
+
+    <form class="chat-input" id="chatForm" autocomplete="off">
+      <div class="field">
+        <input type="text" id="message" placeholder="iMessage…" required />
+      </div>
+      <button type="submit" class="send-btn" id="sendBtn" disabled>↑</button>
+    </form>
+  </div>
+
+  <script>
+        const TRIGGERS = [
+      {
+        // ✅ 단어 A (여기 문자열을 실제 키워드로 바꿔줘)
+        keywords: ["축하"],
+        replies: [
+          "진짜 진짜 축하해줘서 고마워 오늘 🥹",
+          "덕분에 행복한 생일 보낼 수 있게 해줘서 고마워요🫶🏻",
+          "무엇보다 늘 같은 자리에서 응원해줘서 고마워 ㅠㅠㅠ 사랑해 🫶🏻"
+        ],
+        bag: []
+      },
+      {
+        // ✅ 단어 B (여기 문자열을 실제 키워드로 바꿔줘)
+        keywords: ["사랑"],
+        replies: [
+          "사랑해 나도 언제까지나 너 편이 되어줄게",
+          "늘 사랑해요. 늘 곁에 있을게요.",
+          "늘 내가 응원하고 늘 내가 많이 좋아해 사랑해 ♥️",
+          "마음 표현해줘서 고마워 사랑해 🩵💙"
+        ],
+        bag: []
+      }
+    ];
+
+    // 3초 후 오프닝 숨기고 본문 표시
+    window.onload = () => {
+      setTimeout(() => {
+        document.getElementById("intro").style.display = "none";
+        document.getElementById("chatApp").style.display = "block";
+        setDaySeparator();
+        scrollToBottom();
+      }, 3000);
+    };
+
+    const chatForm = document.getElementById("chatForm");
+    const messageList = document.getElementById("messageList");
+    const input = document.getElementById("message");
+    const sendBtn = document.getElementById("sendBtn");
+    const daySep = document.getElementById("daySep");
+
+        function updateSendBtn() {
+          sendBtn.disabled = input.value.trim().length === 0;
+        }
+        
+        updateSendBtn();
+        input.addEventListener("input", updateSendBtn);
+        input.addEventListener("keyup", updateSendBtn);
+        input.addEventListener("compositionend", updateSendBtn);
+
+        
+        // 배열 셔플
+        function shuffle(arr) {
+          return [...arr].sort(() => Math.random() - 0.5);
+        }
+        
+        // 트리거 bag 리필 (연속 중복 줄이기)
+        function refillTriggerBag(trigger) {
+          trigger.bag = shuffle(trigger.replies);
+        }
+        
+        // 입력 텍스트에서 해당되는 트리거 찾기 (위에 있는 트리거 우선)
+        function findTrigger(text) {
+          const t = text.toLowerCase();
+          return TRIGGERS.find(tr =>
+            tr.keywords.some(k => t.includes(String(k).toLowerCase()))
+          ) || null;
+        }
+        
+        // 트리거에 해당하는 랜덤 답장 1개 뽑기
+        function drawReply(trigger) {
+          if (!trigger.bag || trigger.bag.length === 0) refillTriggerBag(trigger);
+          return trigger.bag.pop();
+        }
+        
+        // 날짜 구분선 세팅
+        function setDaySeparator() {
+          const now = new Date();
+          const yy = now.getFullYear();
+          const mm = String(now.getMonth() + 1).padStart(2, "0");
+          const dd = String(now.getDate()).padStart(2, "0");
+          daySep.textContent = `${yy}.${mm}.${dd}`;
+        }
+        
+        // 시간 포맷 (오전/오후)
+        function formatTime(date) {
+          const h = date.getHours();
+          const m = String(date.getMinutes()).padStart(2, "0");
+          const ampm = h < 12 ? "오전" : "오후";
+          const hh = (h % 12) === 0 ? 12 : (h % 12);
+          return `${ampm} ${hh}:${m}`;
+        }
+        
+        // 스크롤 맨 아래로
+        function scrollToBottom() {
+          messageList.scrollTop = messageList.scrollHeight;
+        }
+        
+        // 내 메시지 추가
+        function addMyMessage(text) {
+          const row = document.createElement("div");
+          row.className = "row me";
+        
+          const bubble = document.createElement("div");
+          bubble.className = "bubble me";
+          bubble.textContent = text;
+        
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.textContent = formatTime(new Date());
+        
+          row.appendChild(meta);
+          row.appendChild(bubble);
+          messageList.appendChild(row);
+          scrollToBottom();
+        }
+        
+        // 니콜라스 메시지 추가 (한글만)
+        function addJWMessage(replyText) {
+          const row = document.createElement("div");
+          row.className = "row other";
+        
+          const avatar = document.createElement("div");
+          avatar.className = "avatar";
+          avatar.innerHTML = `<img src="https://i.imgur.com/Cudzc0A.jpeg" alt="Nicholas">`;
+        
+          const bubble = document.createElement("div");
+          bubble.className = "bubble other";
+          bubble.textContent = replyText;
+        
+          row.appendChild(avatar);
+          row.appendChild(bubble);
+          messageList.appendChild(row);
+          scrollToBottom();
+        }
+        
+        // 타이핑 표시
+        let typingEl = null;
+        
+        function showTyping() {
+          const row = document.createElement("div");
+          row.className = "row other";
+        
+          const avatar = document.createElement("div");
+          avatar.className = "avatar";
+          avatar.innerHTML = `<img src="https://i.imgur.com/Cudzc0A.jpeg" alt="Nicholas">`;
+        
+          const typing = document.createElement("div");
+          typing.className = "typing";
+          typing.innerHTML = `<span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
+        
+          row.appendChild(avatar);
+          row.appendChild(typing);
+          messageList.appendChild(row);
+        
+          typingEl = row;
+          scrollToBottom();
+        }
+        
+        function hideTyping() {
+          if (typingEl) typingEl.remove();
+          typingEl = null;
+        }
+        // ✅ (선택) 처음부터 각 트리거 bag 한 번 섞어두고 싶으면
+        TRIGGERS.forEach(refillTriggerBag);
+        
+        // ✅ 전송 버튼 활성/비활성
+        sendBtn.disabled = input.value.trim().length === 0;
+        
+        input.addEventListener("input", () => {
+          sendBtn.disabled = input.value.trim().length === 0;
+        });
+        
+        // ✅ 전송(Submit) 이벤트
+        chatForm.addEventListener("submit", (e) => {
+          e.preventDefault();
+        
+          const text = input.value.trim();
+          if (!text) return;
+        
+          // 내 메시지 추가
+          addMyMessage(text);
+        
+          // 트리거 포함 시 랜덤 답장
+          const trigger = findTrigger(text);
+          if (trigger) {
+            showTyping();
+            setTimeout(() => {
+              hideTyping();
+              addJWMessage(drawReply(trigger)); // 한글 답장만
+            }, 900);
+          }
+        
+          window.onload = () => {
+              setTimeout(() => {
+                document.getElementById("intro").style.display = "none";
+                document.getElementById("chatApp").style.display = "block";
+                setDaySeparator();
+                scrollToBottom();
+                updateSendBtn();
+                input.focus();
+              }, 3000);
+            };
+
+        });
+
+
+    </script>
+</body>
+</html>
+
