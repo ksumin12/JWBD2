@@ -5,408 +5,399 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>自由世界</title>
 
- <style>
-  :root{
-    --vh: 1vh;
+  <style>
+    :root{
+      --vh: 1vh;
 
-    --ios-blue: #007AFF;
-    --bg: #FFFFFF;
-    --line: rgba(0,0,0,0.08);
-    --subtle: rgba(0,0,0,0.45);
-    --text: #111;
-    --bubble-gray: #E9E9EB;
+      --ios-blue: #007AFF;
+      --bg: #FFFFFF;
+      --line: rgba(0,0,0,0.08);
+      --text: #111;
+      --bubble-gray: #E9E9EB;
 
+      /* ✅ tail 튜닝 */
+      --tail-size: 18px;   /* 꼬리 기본 크기 */
+      --tail-out: 7px;     /* 바깥으로 나가는 정도 */
+      --tail-notch: 10px;  /* 흰색(파내는) 조각이 더 바깥으로 가는 정도 */
+      --tail-y: -2px;      /* 꼬리 높이 미세 조정 */
+    }
 
-    --tail: 20px;        /* 꼬리 크기 */
-    --tail-out: 7px;     /* 꼬리 바깥으로 */
-    --tail-cut: 14px;    /* 파내는 조각 더 바깥으로(클수록 안쪽 파임 줄어듦) */
-    --tail-y: -2px;      /* 꼬리 높이 미세조정 */
-  }
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
 
-  *{ box-sizing: border-box; }
-  html, body{ height: 100%; }
+    body{
+      margin: 0;
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      overflow: hidden;
+      height: calc(var(--vh, 1vh) * 100);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
 
-  body{
-    margin: 0;
-    background: var(--bg);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-    overflow: hidden;
-    height: calc(var(--vh, 1vh) * 100);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+    /* Intro */
+    #intro{
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      color: #444;
+      font-size: 14px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      text-align: center;
+      animation: pop 1.5s infinite ease-in-out;
+      z-index: 10;
+      white-space: pre-line;
+      line-height: 1.8;
+    }
+    @keyframes pop{
+      0%, 100%{ transform: scale(1); }
+      50%{ transform: scale(1.05); }
+    }
 
-  /* Intro */
-  #intro{
-    position: fixed;
-    inset: 0;
-    background: #fff;
-    color: #444;
-    font-size: 14px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    text-align: center;
-    animation: pop 1.5s infinite ease-in-out;
-    z-index: 10;
-    white-space: pre-line;
-    line-height: 1.8;
-  }
-  @keyframes pop{
-    0%, 100%{ transform: scale(1); }
-    50%{ transform: scale(1.05); }
-  }
+    /* App shell */
+    .chat-app{
+      display: none;
+      max-width: 520px;
+      margin: 0 auto;
+      background: #fff;
+      height: calc(var(--vh, 1vh) * 100);
+      flex-direction: column;
+    }
 
-  /* App shell */
-  .chat-app{
-    display: none;
-    max-width: 520px;
-    margin: 0 auto;
-    background: #fff;
-    height: calc(var(--vh, 1vh) * 100);
-    flex-direction: column;
-  }
+    /* Header */
+    .chat-header{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
 
-  /* Header (iMessage-like nav) */
-  .chat-header{
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(14px);
-    border-bottom: 1px solid var(--line);
+      padding-top: env(safe-area-inset-top);
+      height: calc(56px + env(safe-area-inset-top));
 
-    padding-top: env(safe-area-inset-top);
-    height: calc(56px + env(safe-area-inset-top));
+      display: grid;
+      grid-template-columns: 56px 1fr 56px;
+      align-items: center;
+    }
 
-    display: grid;
-    grid-template-columns: 56px 1fr 56px;
-    align-items: center;
-  }
+    .nav-btn{
+      width: 44px;
+      height: 44px;
+      border: none;
+      background: transparent;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      margin: 0 6px;
+      color: var(--ios-blue);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-btn svg{ width: 22px; height: 22px; }
 
-  .nav-btn{
-    width: 44px;
-    height: 44px;
-    border: none;
-    background: transparent;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    margin: 0 6px;
-    color: var(--ios-blue);
-    -webkit-tap-highlight-color: transparent;
-  }
-  .nav-btn svg{ width: 22px; height: 22px; }
+    .nav-center{
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-width: 0;
+      transform: translateY(1px);
+    }
+    .nav-avatar{
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .nav-avatar img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .nav-name{
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
-  .nav-center{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    min-width: 0;
-    transform: translateY(1px);
-  }
-  .nav-avatar{
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  }
-  .nav-avatar img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .nav-name{
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1;
-    max-width: 220px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+    /* Message list */
+    .message-list{
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: visible;
 
-  /* Message list */
-  .message-list{
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: visible;
-    padding: 14px calc(12px + var(--tail-cut)) 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding-bottom: calc(18px + 62px + env(safe-area-inset-bottom));
-  }
+      /* ✅ 꼬리 공간 확보(잘림 방지) */
+      padding: 14px calc(12px + var(--tail-out) + var(--tail-notch)) 18px;
 
-  /* System header */
-  .system-block{
-    align-self: center;
-    text-align: center;
-    margin-top: 10px;
-    margin-bottom: 8px;
-    user-select: none;
-  }
-  .system-label{
-    font-size: 12px;
-    color: rgba(0,0,0,0.35);
-    line-height: 1.2;
-  }
-  .system-time{
-    margin-top: 2px;
-    font-size: 12px;
-    color: rgba(0,0,0,0.35);
-    line-height: 1.2;
-  }
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding-bottom: calc(18px + 62px + env(safe-area-inset-bottom));
+    }
 
-  .row{
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    max-width: 100%;
-  }
-  .row.me{ justify-content: flex-end; }
-  .row.other{ justify-content: flex-start; }
+    /* System header */
+    .system-block{
+      align-self: center;
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: 8px;
+      user-select: none;
+    }
+    .system-label,
+    .system-time{
+      font-size: 12px;
+      color: rgba(0,0,0,0.35);
+      line-height: 1.2;
+    }
+    .system-time{ margin-top: 2px; }
 
-  .row.me .stack{
-    max-width: min(78%, 380px);
-    flex-shrink: 0;
-  }
+    .row{
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      max-width: 100%;
+    }
+    .row.me{ justify-content: flex-end; }
+    .row.other{ justify-content: flex-start; }
 
-  /* avatar (left messages) */
-  .avatar{
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    flex: 0 0 28px;
-    overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-  }
-  .avatar img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
+    .row.me .stack{
+      max-width: min(78%, 380px);
+      flex-shrink: 0;
+    }
 
-  /* bubbles */
-  .bubble{
-    display: inline-block;
-    width: fit-content;
-    max-width: 100%;
-    padding: 10px 12px;
-    border-radius: 18px;
-    font-size: 15px;
-    line-height: 1.35;
-    white-space: pre-wrap;
+    /* ✅ 말풍선 래퍼(꼬리는 여기에 붙임) */
+    .bubble-wrap{
+      position: relative;
+      display: inline-block;
+      max-width: 100%;
+      z-index: 0; /* stacking context */
+    }
+    .row.other .bubble-wrap{
+      max-width: min(78%, 380px);
+    }
 
-    word-break: keep-all;
-    overflow-wrap: break-word;
+    /* bubbles */
+    .bubble{
+      display: inline-block;
+      width: fit-content;
+      max-width: 100%;
+      padding: 10px 12px;
+      border-radius: 18px;
+      font-size: 15px;
+      line-height: 1.35;
+      white-space: pre-wrap;
 
-    position: relative;
-    overflow: visible;   /* ✅ 꼬리가 밖으로 나와야 해서 visible */
-    isolation: isolate;
-    z-index: 0;
-  }
-  .row.other .bubble{
-    max-width: min(78%, 380px);
-  }
+      word-break: keep-all;
+      overflow-wrap: break-word;
 
-  .bubble.me{
-    background: var(--ios-blue);
-    color: #fff;
-    border-bottom-right-radius: 6px;
-  }
-  .bubble.other{
-    background: var(--bubble-gray);
-    color: #111;
-    border-bottom-left-radius: 6px;
-  }  
+      position: relative;
+      z-index: 2; /* ✅ 꼬리/노치보다 항상 위 */
+      isolation: isolate;
+    }
 
-  /* stack for my bubble +  */
-  .stack{
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 4px;
-  }
+    .bubble.me{
+      background: var(--ios-blue);
+      color: #fff;
+      border-bottom-right-radius: 6px;
+    }
+    .bubble.other{
+      background: var(--bubble-gray);
+      color: #111;
+      border-bottom-left-radius: 6px;
+    }
 
-  /* Typing indicator */
-  .typing{
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 10px 12px;
-    border-radius: 18px;
-    background: var(--bubble-gray);
-    border-bottom-left-radius: 6px;
-  }
-  .dot{
-    width: 6px;
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(0,0,0,0.35);
-    animation: bounce 1s infinite ease-in-out;
-  }
-  .dot:nth-child(2){ animation-delay: 0.12s; }
-  .dot:nth-child(3){ animation-delay: 0.24s; }
-  @keyframes bounce{
-    0%, 80%, 100%{ transform: translateY(0); opacity: 0.5; }
-    40%{ transform: translateY(-4px); opacity: 1; }
-  }
+    /* stack */
+    .stack{
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
 
-  /* Input bar like iMessage */
-  .chat-input{
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
+    /* Typing indicator */
+    .typing{
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: var(--bubble-gray);
+      border-bottom-left-radius: 6px;
+    }
+    .dot{
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.35);
+      animation: bounce 1s infinite ease-in-out;
+    }
+    .dot:nth-child(2){ animation-delay: 0.12s; }
+    .dot:nth-child(3){ animation-delay: 0.24s; }
+    @keyframes bounce{
+      0%, 80%, 100%{ transform: translateY(0); opacity: 0.5; }
+      40%{ transform: translateY(-4px); opacity: 1; }
+    }
 
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    /* Input bar */
+    .chat-input{
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
 
-    padding: 8px 12px;
-    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      display: flex;
+      align-items: center;
+      gap: 10px;
 
-    background: rgba(255,255,255,0.94);
-    backdrop-filter: blur(14px);
-    border-top: 1px solid var(--line);
-  }
+      padding: 8px 12px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
 
-  .icon-circle{
-    width: 32px;
-    height: 32px;
-    border-radius: 999px;
-    border: none;
-    background: rgba(0,0,0,0.06);
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .icon-circle svg{ width: 18px; height: 18px; color: rgba(0,0,0,0.55); }
+      background: rgba(255,255,255,0.94);
+      backdrop-filter: blur(14px);
+      border-top: 1px solid var(--line);
+    }
 
-  .field{
-    flex: 1;
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    .icon-circle{
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: none;
+      background: rgba(0,0,0,0.06);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .icon-circle svg{ width: 18px; height: 18px; color: rgba(0,0,0,0.55); }
 
-    padding: 10px 44px 10px 14px;
-    border-radius: 22px;
-    background: #fff;
-    border: 1px solid rgba(0,0,0,0.15);
-  }
+    .field{
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
 
-  .chat-input input{
-    border: none;
-    outline: none;
-    width: 100%;
-    font-size: 16px;
-    background: transparent;
-  }
+      padding: 10px 44px 10px 14px;
+      border-radius: 22px;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.15);
+    }
 
-  .field-action{
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 30px;
-    height: 30px;
-    border-radius: 999px;
-    border: none;
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
+    .chat-input input{
+      border: none;
+      outline: none;
+      width: 100%;
+      font-size: 16px;
+      background: transparent;
+    }
 
-  .mic-btn{
-    background: transparent;
-    color: rgba(0,0,0,0.55);
-  }
-  .mic-btn svg{ width: 18px; height: 18px; }
+    .field-action{
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: none;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-  .send-btn{
-    background: var(--ios-blue);
-    color: #fff;
-    display: none;
-  }
-  .send-btn svg{ width: 16px; height: 16px; }
+    .mic-btn{
+      background: transparent;
+      color: rgba(0,0,0,0.55);
+    }
+    .mic-btn svg{ width: 18px; height: 18px; }
 
-  .send-btn[aria-disabled="true"]{
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
+    .send-btn{
+      background: var(--ios-blue);
+      color: #fff;
+      display: none;
+    }
+    .send-btn svg{ width: 16px; height: 16px; }
 
+    .send-btn[aria-disabled="true"]{
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
 
-   
+    /* =========================================================
+       ✅ 꼬리/노치: .bubble-wrap에 붙임 (흰색이 말풍선 침범 X)
+       - ::before = 꼬리(색)
+       - ::after  = 파내는(배경색) 노치
+       ========================================================= */
 
-/* 오른쪽(나) 꼬리 */
-.bubble.me::before{
-  content:"";
-  position:absolute;
-  right: calc(-1 * var(--tail-out));
-  bottom: var(--tail-y);
-  width: var(--tail);
-  height: var(--tail);
-  background: var(--ios-blue);
-  border-bottom-left-radius: 16px 14px;
-  z-index: -2;
-  pointer-events:none;
-}
-.bubble.me::after{
-  content:"";
-  position:absolute;
-  right: calc(-1 * var(--tail-cut));
-  bottom: var(--tail-y);
-  width: var(--tail);
-  height: var(--tail);
-  background: var(--bg); /* 배경색(지금은 흰색) */
-  border-bottom-left-radius: 16px 14px;
-  z-index: -1;
-  pointer-events:none;
-}
+    /* 오른쪽(나) */
+    .bubble-wrap.me::before{
+      content:"";
+      position:absolute;
+      right: calc(-1 * var(--tail-out));
+      bottom: var(--tail-y);
+      width: var(--tail-size);
+      height: var(--tail-size);
+      background: var(--ios-blue);
+      border-radius: 0 0 0 var(--tail-size);
+      z-index: 0;
+      pointer-events:none;
+    }
+    .bubble-wrap.me::after{
+      content:"";
+      position:absolute;
+      right: calc(-1 * (var(--tail-out) + var(--tail-notch)));
+      bottom: var(--tail-y);
+      width: var(--tail-size);
+      height: var(--tail-size);
+      background: var(--bg);
+      border-radius: 0 0 0 var(--tail-size);
+      z-index: 1; /* 꼬리 위(잘라내기), 말풍선 아래 */
+      pointer-events:none;
+    }
 
-/* 왼쪽(상대) 꼬리 */
-.bubble.other::before{
-  content:"";
-  position:absolute;
-  left: calc(-1 * var(--tail-out));
-  bottom: var(--tail-y);
-  width: var(--tail);
-  height: var(--tail);
-  background: var(--bubble-gray);
-  border-bottom-right-radius: 16px 14px;
-  z-index: -2;
-  pointer-events:none;
-}
-.bubble.other::after{
-  content:"";
-  position:absolute;
-  left: calc(-1 * var(--tail-cut));
-  bottom: var(--tail-y);
-  width: var(--tail);
-  height: var(--tail);
-  background: var(--bg);
-  border-bottom-right-radius: 16px 14px;
-  z-index: -1;
-  pointer-events:none;
-}
+    /* 왼쪽(상대) */
+    .bubble-wrap.other::before{
+      content:"";
+      position:absolute;
+      left: calc(-1 * var(--tail-out));
+      bottom: var(--tail-y);
+      width: var(--tail-size);
+      height: var(--tail-size);
+      background: var(--bubble-gray);
+      border-radius: 0 0 var(--tail-size) 0;
+      z-index: 0;
+      pointer-events:none;
+    }
+    .bubble-wrap.other::after{
+      content:"";
+      position:absolute;
+      left: calc(-1 * (var(--tail-out) + var(--tail-notch)));
+      bottom: var(--tail-y);
+      width: var(--tail-size);
+      height: var(--tail-size);
+      background: var(--bg);
+      border-radius: 0 0 var(--tail-size) 0;
+      z-index: 1;
+      pointer-events:none;
+    }
 
-
-  @media (max-width: 480px){
-    #intro{ font-size: 11px; padding: 30px 20px; }
-    .bubble{ font-size: 15px; }
-    .chat-app{ max-width: 100%; }
-  }
-</style>
+    @media (max-width: 480px){
+      #intro{ font-size: 11px; padding: 30px 20px; }
+      .bubble{ font-size: 15px; }
+      .chat-app{ max-width: 100%; }
+    }
+  </style>
 </head>
 
 <body>
@@ -417,7 +408,6 @@
   <div class="chat-app" id="chatApp">
     <div class="chat-header">
       <button class="nav-btn" type="button" aria-label="Back">
-        <!-- chevron-left -->
         <svg viewBox="0 0 24 24" fill="none">
           <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
@@ -431,7 +421,6 @@
       </div>
 
       <button class="nav-btn" type="button" aria-label="Video">
-        <!-- video icon -->
         <svg viewBox="0 0 24 24" fill="none">
           <path d="M15 10l5-3v10l-5-3v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2z"
                 stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
@@ -448,7 +437,6 @@
 
     <form class="chat-input" id="chatForm" autocomplete="off">
       <button class="icon-circle" type="button" aria-label="Plus">
-        <!-- plus -->
         <svg viewBox="0 0 24 24" fill="none">
           <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
         </svg>
@@ -457,7 +445,6 @@
       <div class="field">
         <input type="text" id="message" placeholder="iMessage" required />
 
-        <!-- mic (default) -->
         <button class="field-action mic-btn" type="button" id="micBtn" aria-label="Mic">
           <svg viewBox="0 0 24 24" fill="none">
             <path d="M12 14a3 3 0 0 0 3-3V7a3 3 0 0 0-6 0v4a3 3 0 0 0 3 3z"
@@ -467,7 +454,6 @@
           </svg>
         </button>
 
-        <!-- send (only when text) -->
         <button class="field-action send-btn" type="submit" id="sendBtn" aria-label="Send" aria-disabled="true">
           <svg viewBox="0 0 24 24" fill="none">
             <path d="M12 19V5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
@@ -540,7 +526,6 @@
       const ampm = h < 12 ? "오전" : "오후";
       const hh = (h % 12) === 0 ? 12 : (h % 12);
 
-      // "오늘" 표시(원하면 제거 가능)
       const now = new Date();
       const isToday =
         now.getFullYear() === date.getFullYear() &&
@@ -562,7 +547,6 @@
     function updateActions(){
       const hasText = input.value.trim().length > 0;
 
-      // mic <-> send 토글
       if (hasText){
         sendBtn.style.display = "grid";
         sendBtn.setAttribute("aria-disabled", "false");
@@ -581,14 +565,17 @@
       const stack = document.createElement("div");
       stack.className = "stack";
 
+      const wrap = document.createElement("div");
+      wrap.className = "bubble-wrap me";
+
       const bubble = document.createElement("div");
       bubble.className = "bubble me";
       bubble.textContent = text;
 
-
-      stack.appendChild(bubble);
-
+      wrap.appendChild(bubble);
+      stack.appendChild(wrap);
       row.appendChild(stack);
+
       messageList.appendChild(row);
       scrollToBottom();
     }
@@ -596,34 +583,37 @@
     function addJWMessage(replyText) {
       const row = document.createElement("div");
       row.className = "row other";
-    
+
+      const wrap = document.createElement("div");
+      wrap.className = "bubble-wrap other";
+
       const bubble = document.createElement("div");
       bubble.className = "bubble other";
       bubble.textContent = replyText;
-    
-      row.appendChild(bubble);
+
+      wrap.appendChild(bubble);
+      row.appendChild(wrap);
+
       messageList.appendChild(row);
       scrollToBottom();
     }
-
 
     let typingEl = null;
 
     function showTyping() {
       const row = document.createElement("div");
       row.className = "row other";
-    
+
       const typing = document.createElement("div");
       typing.className = "typing";
       typing.innerHTML = `<span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
-    
+
       row.appendChild(typing);
       messageList.appendChild(row);
-    
+
       typingEl = row;
       scrollToBottom();
     }
-
 
     function hideTyping(){
       if (typingEl) typingEl.remove();
@@ -654,11 +644,8 @@
       if (!text) return;
 
       addMyMessage(text);
-
-      // 상단 시간은 "마지막 메시지 시각" 느낌으로 갱신
       setDaySeparator(new Date());
 
-      // 입력 초기화 + 키보드 내리기(원치 않으면 blur 제거)
       input.value = "";
       updateActions();
       document.activeElement?.blur();
@@ -675,8 +662,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
