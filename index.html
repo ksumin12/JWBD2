@@ -15,14 +15,6 @@
     --subtle: rgba(0,0,0,0.45);
     --text: #111;
     --bubble-gray: #E9E9EB;
-
-    /* ✅ tail(꼬리) 튜닝값 */
-    --chat-bg: #FFFFFF;   /* 채팅 배경색(지금은 흰색) */
-    --tail: 16px;         /* 꼬리 원 크기 */
-    --tail-out: 3px;      /* 밖으로 튀어나오는 정도(작을수록 안쪽) */
-    --tail-cut: 8px;     /* 파임 정도(클수록 더 파임) */
-    --cut-size: 16px;     /* 파임 원 크기(클수록 더 많이 파임) */
-    --tail-bottom: -1px;  /* 아래로 내리기(0 ~ -2px 추천) */
   }
 
   *{ box-sizing: border-box; }
@@ -211,10 +203,6 @@
 
     position: relative;
     overflow: visible;
-
-    /* ✅ 꼬리 z-index가 본체를 깎지 않도록 안전장치 */
-    isolation: isolate;
-    z-index: 0;
   }
   .row.other .bubble{
     max-width: min(78%, 380px);
@@ -229,51 +217,8 @@
     background: var(--bubble-gray);
     color: #111;
     border-bottom-left-radius: 6px;
-  }
+  }  
 
-  /* ✅ iMessage tail (본체 안 잘리게: 뒤 레이어로) */
-  .bubble::before,
-  .bubble::after{
-    content:"";
-    position:absolute;
-    bottom: var(--tail-bottom);
-    border-radius: 999px;
-    pointer-events: none;
-  }
-
-  /* 오른쪽(내) 꼬리: 색 원 */
-  .bubble.me::after{
-    right: calc(-1 * var(--tail-out));
-    width: var(--tail);
-    height: var(--tail);
-    background: var(--ios-blue);
-    z-index: -2;
-  }
-  /* 오른쪽(내) 꼬리: 배경 원(파임) */
-  .bubble.me::before{
-    right: calc(-1 * (var(--tail-out) + var(--tail-cut)));
-    width: var(--cut-size);
-    height: var(--cut-size);
-    background: var(--chat-bg);
-    z-index: -1;
-  }
-
-  /* 왼쪽(상대) 꼬리: 색 원 */
-  .bubble.other::after{
-    left: calc(-1 * var(--tail-out));
-    width: var(--tail);
-    height: var(--tail);
-    background: var(--bubble-gray);
-    z-index: -2;
-  }
-  /* 왼쪽(상대) 꼬리: 배경 원(파임) */
-  .bubble.other::before{
-    left: calc(-1 * (var(--tail-out) + var(--tail-cut)));
-    width: var(--cut-size);
-    height: var(--cut-size);
-    background: var(--chat-bg);
-    z-index: -1;
-  }
 
   /* stack for my bubble +  */
   .stack{
@@ -391,6 +336,51 @@
     opacity: 0.55;
     cursor: not-allowed;
   }
+
+  /* ===== iMessage tail (본체 안 깎이는 버전) ===== */
+:root{
+  --tail-size: 16px;     /* 꼬리 크기 */
+  --tail-out: 6px;       /* 밖으로 나오는 정도(작을수록 안쪽) */
+  --tail-bottom: -1px;   /* 아래로 내리기 */
+}
+
+/* bubble은 꼬리가 밖으로 나올 수 있게 */
+.bubble{
+  position: relative;
+  overflow: visible;
+}
+
+/* 오른쪽(내 말풍선) 꼬리 */
+.bubble.me::after{
+  content:"";
+  position:absolute;
+  right: calc(-1 * var(--tail-out));
+  bottom: var(--tail-bottom);
+  width: var(--tail-size);
+  height: var(--tail-size);
+  background: var(--ios-blue);
+
+  /* 물방울 모양 핵심 */
+  border-radius: 0 999px 999px 999px;
+  transform: rotate(-45deg);
+  pointer-events: none;
+}
+
+/* 왼쪽(상대 말풍선) 꼬리 */
+.bubble.other::after{
+  content:"";
+  position:absolute;
+  left: calc(-1 * var(--tail-out));
+  bottom: var(--tail-bottom);
+  width: var(--tail-size);
+  height: var(--tail-size);
+  background: var(--bubble-gray);
+
+  border-radius: 999px 0 999px 999px;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
 
   @media (max-width: 480px){
     #intro{ font-size: 11px; padding: 30px 20px; }
@@ -669,6 +659,7 @@
   </script>
 </body>
 </html>
+
 
 
 
