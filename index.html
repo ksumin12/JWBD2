@@ -21,6 +21,11 @@
     --tail-out: 7px;        /* 말풍선 밖으로 나가는 정도 */
     --tail-bottom: 0px;     /* 꼬리 바닥 위치 */
     --tail-notch-out: 3px;  /* 파인 노치가 더 바깥으로 밀리는 정도 */
+
+      --tail: 20px;        /* 꼬리 크기 */
+  --tail-out: 7px;     /* 꼬리 바깥으로 */
+  --tail-cut: 14px;    /* 파내는 조각 더 바깥으로(클수록 안쪽 파임 줄어듦) */
+  --tail-y: -2px;      /* 꼬리 높이 미세조정 */
   }
 
   *{ box-sizing: border-box; }
@@ -210,6 +215,7 @@
     position: relative;
     overflow: visible;   /* ✅ 꼬리가 밖으로 나와야 해서 visible */
     isolation: isolate;
+    z-index: 0;
   }
   .row.other .bubble{
     max-width: min(78%, 380px);
@@ -343,59 +349,61 @@
     cursor: not-allowed;
   }
 
-  /* ✅ iMessage 스타일 꼬리 (색 꼬리 + 배경으로 파내는 노치) */
-  .bubble.me::before{
-    content:"";
-    position:absolute;
-    right: calc(-1 * var(--tail-out));
-    bottom: var(--tail-bottom);
-    width: var(--tail-size);
-    height: var(--tail-size);
-    background: var(--ios-blue);
-    pointer-events:none;
 
-    /* 오른쪽 말풍선: 꼬리의 안쪽(왼쪽 아래)만 둥글게 */
-    border-radius: 0 0 0 var(--tail-size);
-  }
-  .bubble.me::after{
-    content:"";
-    position:absolute;
-    right: calc(-1 * (var(--tail-out) + var(--tail-notch-out)));
-    bottom: var(--tail-bottom);
-    width: var(--tail-size);
-    height: var(--tail-size);
-    background: var(--bg);
-    pointer-events:none;
+   
 
-    /* 같은 라운드로 겹쳐서 "파인" 느낌 만들기 */
-    border-radius: 0 0 0 var(--tail-size);
-  }
+/* 오른쪽(나) 꼬리 */
+.bubble.me::before{
+  content:"";
+  position:absolute;
+  right: calc(-1 * var(--tail-out));
+  bottom: var(--tail-y);
+  width: var(--tail);
+  height: var(--tail);
+  background: var(--ios-blue);
+  border-bottom-left-radius: 16px 14px;
+  z-index: -1;
+  pointer-events:none;
+}
+.bubble.me::after{
+  content:"";
+  position:absolute;
+  right: calc(-1 * var(--tail-cut));
+  bottom: var(--tail-y);
+  width: var(--tail);
+  height: var(--tail);
+  background: var(--bg); /* 배경색(지금은 흰색) */
+  border-bottom-left-radius: 16px 14px;
+  z-index: -1;
+  pointer-events:none;
+}
 
-  .bubble.other::before{
-    content:"";
-    position:absolute;
-    left: calc(-1 * var(--tail-out));
-    bottom: var(--tail-bottom);
-    width: var(--tail-size);
-    height: var(--tail-size);
-    background: var(--bubble-gray);
-    pointer-events:none;
+/* 왼쪽(상대) 꼬리 */
+.bubble.other::before{
+  content:"";
+  position:absolute;
+  left: calc(-1 * var(--tail-out));
+  bottom: var(--tail-y);
+  width: var(--tail);
+  height: var(--tail);
+  background: var(--bubble-gray);
+  border-bottom-right-radius: 16px 14px;
+  z-index: -1;
+  pointer-events:none;
+}
+.bubble.other::after{
+  content:"";
+  position:absolute;
+  left: calc(-1 * var(--tail-cut));
+  bottom: var(--tail-y);
+  width: var(--tail);
+  height: var(--tail);
+  background: var(--bg);
+  border-bottom-right-radius: 16px 14px;
+  z-index: -1;
+  pointer-events:none;
+}
 
-    /* 왼쪽 말풍선: 꼬리의 안쪽(오른쪽 아래)만 둥글게 */
-    border-radius: 0 0 var(--tail-size) 0;
-  }
-  .bubble.other::after{
-    content:"";
-    position:absolute;
-    left: calc(-1 * (var(--tail-out) + var(--tail-notch-out)));
-    bottom: var(--tail-bottom);
-    width: var(--tail-size);
-    height: var(--tail-size);
-    background: var(--bg);
-    pointer-events:none;
-
-    border-radius: 0 0 var(--tail-size) 0;
-  }
 
   @media (max-width: 480px){
     #intro{ font-size: 11px; padding: 30px 20px; }
@@ -671,4 +679,5 @@
   </script>
 </body>
 </html>
+
 
