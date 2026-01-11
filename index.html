@@ -20,6 +20,7 @@
       --tail-out: 2px;     /* 바깥으로 나가는 정도 */
       --tail-notch: 13px;  /* 흰색(파내는) 조각이 더 바깥으로 가는 정도 */
       --tail-y: -2px;      /* 꼬리 높이 미세 조정 */
+      --tail-cut: 3px;
     }
 
     *{ box-sizing: border-box; }
@@ -340,57 +341,60 @@
        - ::after  = 파내는(배경색) 노치
        ========================================================= */
 
-    /* 오른쪽(나) */
-    .bubble-wrap.me::before{
-      content:"";
-      position:absolute;
-      right: calc(-1 * var(--tail-out));
-      bottom: var(--tail-y);
-      width: var(--tail-size);
-      height: var(--tail-size);
-      background: var(--ios-blue);
-      border-radius: 0 0 0 var(--tail-size);
-      z-index: 0;
-      pointer-events:none;
-    }
-    .bubble-wrap.me::after{
-      content:"";
-      position:absolute;
-      right: calc(-1 * (var(--tail-out) + var(--tail-notch)));
-      bottom: var(--tail-y);
-      width: var(--tail-size);
-      height: var(--tail-size);
-      background: var(--bg);
-      border-radius: 0 0 0 var(--tail-size);
-      z-index: 1; /* 꼬리 위(잘라내기), 말풍선 아래 */
-      pointer-events:none;
-    }
+   /* ✅ 꼬리/노치: 원 + 원 겹치기 (끝이 안 잘림) */
 
-    /* 왼쪽(상대) */
-    .bubble-wrap.other::before{
-      content:"";
-      position:absolute;
-      left: calc(-1 * var(--tail-out));
-      bottom: var(--tail-y);
-      width: var(--tail-size);
-      height: var(--tail-size);
-      background: var(--bubble-gray);
-      border-radius: 0 0 var(--tail-size) 0;
-      z-index: 0;
-      pointer-events:none;
-    }
-    .bubble-wrap.other::after{
-      content:"";
-      position:absolute;
-      left: calc(-1 * (var(--tail-out) + var(--tail-notch)));
-      bottom: var(--tail-y);
-      width: var(--tail-size);
-      height: var(--tail-size);
-      background: var(--bg);
-      border-radius: 0 0 var(--tail-size) 0;
-      z-index: 1;
-      pointer-events:none;
-    }
+/* 오른쪽(나) */
+.bubble-wrap.me::before{
+  content:"";
+  position:absolute;
+  right: calc(-1 * var(--tail-out));
+  bottom: var(--tail-y);
+  width: var(--tail-size);
+  height: var(--tail-size);
+  background: var(--ios-blue);
+  border-radius: 999px;   /* ✅ 원 */
+  z-index: 0;
+  pointer-events:none;
+}
+.bubble-wrap.me::after{
+  content:"";
+  position:absolute;
+  /* ✅ 흰색 원을 꼬리보다 '조금 안쪽(말풍선 쪽)'으로 */
+  right: calc(-1 * (var(--tail-out) - var(--tail-cut)));
+  bottom: var(--tail-y);
+  width: calc(var(--tail-size) + 2px);   /* 이음새 방지용 살짝 크게 */
+  height: calc(var(--tail-size) + 2px);
+  background: var(--bg);
+  border-radius: 999px;   /* ✅ 원 */
+  z-index: 1;
+  pointer-events:none;
+}
+
+/* 왼쪽(상대) */
+.bubble-wrap.other::before{
+  content:"";
+  position:absolute;
+  left: calc(-1 * var(--tail-out));
+  bottom: var(--tail-y);
+  width: var(--tail-size);
+  height: var(--tail-size);
+  background: var(--bubble-gray);
+  border-radius: 999px;
+  z-index: 0;
+  pointer-events:none;
+}
+.bubble-wrap.other::after{
+  content:"";
+  position:absolute;
+  left: calc(-1 * (var(--tail-out) - var(--tail-cut)));
+  bottom: var(--tail-y);
+  width: calc(var(--tail-size) + 2px);
+  height: calc(var(--tail-size) + 2px);
+  background: var(--bg);
+  border-radius: 999px;
+  z-index: 1;
+  pointer-events:none;
+}
 
     @media (max-width: 480px){
       #intro{ font-size: 11px; padding: 30px 20px; }
@@ -662,5 +666,6 @@
   </script>
 </body>
 </html>
+
 
 
