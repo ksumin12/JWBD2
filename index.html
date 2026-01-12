@@ -20,7 +20,7 @@
       --tail-h: 18px;      /* 꼬리 세로(조금 낮게) */
       --tail-out: 4px;     /* 말풍선에서 얼마나 밖으로 */
       --tail-notch: 14px;  /* ✅ 흰색 컷을 더 바깥으로(말림 방지 핵심) */
-      --tail-y: -4px;  
+      --tail-y: -4px;
       --edge-pad: 2px;
     }
 
@@ -37,7 +37,7 @@
       -moz-osx-font-smoothing: grayscale;
     }
 
-   /* Intro */
+    /* Intro */
     #intro{
       position: fixed;
       inset: 0;
@@ -59,7 +59,6 @@
       50%{ transform: scale(1.05); }
     }
 
-    
     /* App shell */
     .chat-app{
       display: none;
@@ -80,9 +79,9 @@
       border-bottom: 1px solid var(--line);
 
       padding-top: env(safe-area-inset-top);
-      padding-bottom: 6px; 
+      padding-bottom: 6px;
       min-height: calc(56px + env(safe-area-inset-top));
-      height: auto; 
+      height: auto;
       display: grid;
       grid-template-columns: 56px 1fr 56px;
       align-items: center;
@@ -117,7 +116,7 @@
       border-radius: 50%;
       overflow: hidden;
       box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-      margin-top: 4px;  
+      margin-top: 4px;
     }
     .nav-avatar img{
       width: 100%;
@@ -129,7 +128,7 @@
       font-size: 13px;
       font-weight: 600;
       color: var(--text);
-      line-height: 1.2;       /* ✅ 1 -> 1.2 */
+      line-height: 1.2;
       padding-bottom: 2px;
       max-width: 220px;
       overflow: hidden;
@@ -145,7 +144,7 @@
 
       /* ✅ 꼬리 공간 확보(잘림 방지) */
       padding: 8px calc(var(--edge-pad) + var(--tail-out) + var(--tail-notch)) 18px;
-      
+
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -345,8 +344,7 @@
        - ::before = 꼬리(색)
        - ::after  = 파내는(배경색) 노치
        ========================================================= */
-    /* ✅ 덜 말리는 iMessage 꼬리(바깥쪽 컷) */
-    
+
     /* 오른쪽(나) */
     .bubble-wrap.me::before{
       content:"";
@@ -375,7 +373,7 @@
       z-index: 1;
       pointer-events:none;
     }
-    
+
     /* 왼쪽(상대) */
     .bubble-wrap.other::before{
       content:"";
@@ -404,7 +402,6 @@
       pointer-events:none;
     }
 
-
     @media (max-width: 480px){
       #intro{ font-size: 11px; padding: 30px 20px; }
       .chat-app{ max-width: 100%; }
@@ -416,7 +413,6 @@
   <div id="intro">
     <div class="intro-title" id="introTitle"> 💌 </div>
   </div>
-
 
   <div class="chat-app" id="chatApp">
     <div class="chat-header">
@@ -486,7 +482,7 @@
           "덕분에 행복한 생일 보낼 수 있게 해줘서 고마워요🫶🏻",
           "무엇보다 늘 같은 자리에서 응원해줘서 고마워 ㅠㅠㅠ 사랑해 🫶🏻"
         ],
-        bag: []
+        recent: [] // ✅ 최근 N개 중복 방지용
       },
       {
         keywords: ["사랑"],
@@ -496,7 +492,7 @@
           "늘 내가 응원하고 늘 내가 많이 좋아해 사랑해 ♥️",
           "마음 표현해줘서 고마워 사랑해 🩵💙"
         ],
-        bag: []
+        recent: [] // ✅ 최근 N개 중복 방지용
       }
     ];
 
@@ -509,18 +505,66 @@
     window.addEventListener('resize', setVh);
     window.addEventListener('orientationchange', setVh);
 
-    // utils
-    function shuffle(arr){ return [...arr].sort(() => Math.random() - 0.5); }
-    function refillTriggerBag(trigger){ trigger.bag = shuffle(trigger.replies); }
-    function findTrigger(text){
-      const t = text.toLowerCase();
-      return TRIGGERS.find(tr => tr.keywords.some(k => t.includes(String(k).toLowerCase()))) || null;
+    // =========================
+    // ✅ 랜덤/중복방지 로직 (규칙처럼 안 느껴지게)
+    // =========================
+
+    // 더 자연스러운 랜덤(crypto 우선, 없으면 Math.random fallback)
+    function randInt(max){
+      if (max <= 0) return 0;
+      if (window.crypto?.getRandomValues) {
+        const buf = new Uint32Array(1);
+        window.crypto.getRandomValues(buf);
+        return buf[0] % max;
+      }
+      return Math.floor(Math.random() * max);
     }
-    function drawReply(trigger){
-      if (!trigger.bag || trigger.bag.length === 0) refillTriggerBag(trigger);
-      return trigger.bag.pop();
+    function pickRandom(arr){
+      return arr[randInt(arr.length)];
     }
 
+    // 여러 트리거가 동시에 매칭되면 그 중에서도 랜덤 선택
+    function findTrigger(text){
+      const t = text.toLowerCase();
+      const matches = TRIGGERS.filter(tr =>
+        tr.keywords.some(k => t.includes(String(k).toLowerCase()))
+      );
+      return matches.length ? pickRandom(matches) : null;
+    }
+
+    // “완전 랜덤” + “최근 N개 중복 방지”
+    function drawReply(trigger){
+      const replies = trigger.replies;
+      if (!replies || replies.length === 0) return "";
+
+      // 최근 몇 개까지 안 겹치게 할지 (원하면 숫자만 바꾸면 됨)
+      const RECENT_BLOCK = Math.min(2, replies.length - 1); // 기본 2개(답장 적으면 자동 축소)
+      trigger.recent = trigger.recent || [];
+
+      // 최근 답장 제외한 풀
+      let pool = replies.filter(r => !trigger.recent.includes(r));
+
+      // 전부 막혔으면(=최근에 다 나왔으면) 최근 기록을 조금 비워서 다시 랜덤
+      if (pool.length === 0) {
+        trigger.recent = trigger.recent.slice(-Math.max(0, RECENT_BLOCK - 1));
+        pool = replies.filter(r => !trigger.recent.includes(r));
+        if (pool.length === 0) pool = replies.slice(); // 그래도 없으면 그냥 전체 허용
+      }
+
+      const chosen = pickRandom(pool);
+
+      // 최근 기록 업데이트
+      if (RECENT_BLOCK > 0) {
+        trigger.recent.push(chosen);
+        while (trigger.recent.length > RECENT_BLOCK) trigger.recent.shift();
+      }
+
+      return chosen;
+    }
+
+    // =========================
+    // UI 로직
+    // =========================
     const chatForm = document.getElementById("chatForm");
     const messageList = document.getElementById("messageList");
     const input = document.getElementById("message");
@@ -634,7 +678,6 @@
     }
 
     // init
-    TRIGGERS.forEach(refillTriggerBag);
     input.addEventListener("input", updateActions);
     input.addEventListener("compositionend", updateActions);
 
@@ -666,15 +709,15 @@
       const trigger = findTrigger(text);
       if (trigger) {
         showTyping();
+
+        // ✅ 타이핑 딜레이도 랜덤(규칙 느낌 제거)
+        const delay = 300 + randInt(700); // 300~999ms
         setTimeout(() => {
           hideTyping();
           addJWMessage(drawReply(trigger));
-        }, 500);
+        }, delay);
       }
     });
   </script>
 </body>
 </html>
-
-
-
