@@ -200,7 +200,7 @@
       max-width: 100%;
       padding: 10px 12px;
       border-radius: 25px;
-      font-size: 12.5px;
+      font-size: 13px;
       line-height: 1.32;
       white-space: pre-wrap;
 
@@ -414,7 +414,7 @@
 
 <body>
   <div id="intro">
-    <div class="intro-title" id="introTitle">폰트크기수정 접속 중</div>
+    <div class="intro-title" id="introTitle"> 접속 중</div>
   </div>
 
 
@@ -478,23 +478,6 @@
   </div>
 
   <script>
-
-    // ✅ 완전 랜덤용(중복 허용) + 더 좋은 난수(crypto 우선)
-    function randInt(max){
-      if (max <= 0) return 0;
-      if (window.crypto?.getRandomValues){
-        const buf = new Uint32Array(1);
-        window.crypto.getRandomValues(buf);
-        return buf[0] % max;
-      }
-      return Math.floor(Math.random() * max);
-    }
-    
-    function drawReply(trigger){
-      const list = trigger.replies;
-      return list[randInt(list.length)];
-    }
-
     const TRIGGERS = [
       {
         keywords: ["축하"],
@@ -502,7 +485,8 @@
           "진짜 진짜 축하해줘서 고마워 오늘 🥹",
           "덕분에 행복한 생일 보낼 수 있게 해줘서 고마워요🫶🏻",
           "무엇보다 늘 같은 자리에서 응원해줘서 고마워 ㅠㅠㅠ 사랑해 🫶🏻"
-        ]
+        ],
+        bag: []
       },
       {
         keywords: ["사랑"],
@@ -511,10 +495,10 @@
           "늘 사랑해요. 늘 곁에 있을게요.",
           "늘 내가 응원하고 늘 내가 많이 좋아해 사랑해 ♥️",
           "마음 표현해줘서 고마워 사랑해 🩵💙"
-        ]
+        ],
+        bag: []
       }
     ];
-
 
     // iOS vh fix
     function setVh() {
@@ -526,7 +510,8 @@
     window.addEventListener('orientationchange', setVh);
 
     // utils
-  
+    function shuffle(arr){ return [...arr].sort(() => Math.random() - 0.5); }
+    function refillTriggerBag(trigger){ trigger.bag = shuffle(trigger.replies); }
     function findTrigger(text){
       const t = text.toLowerCase();
       return TRIGGERS.find(tr => tr.keywords.some(k => t.includes(String(k).toLowerCase()))) || null;
@@ -649,6 +634,7 @@
     }
 
     // init
+    TRIGGERS.forEach(refillTriggerBag);
     input.addEventListener("input", updateActions);
     input.addEventListener("compositionend", updateActions);
 
@@ -689,3 +675,5 @@
   </script>
 </body>
 </html>
+
+
