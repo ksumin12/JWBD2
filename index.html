@@ -21,6 +21,7 @@
       --tail-out: 4px;     /* 말풍선에서 얼마나 밖으로 */
       --tail-notch: 14px;  /* ✅ 흰색 컷을 더 바깥으로(말림 방지 핵심) */
       --tail-y: -4px;  
+      --edge-pad: 4px;
     }
 
     *{ box-sizing: border-box; }
@@ -143,8 +144,8 @@
       overflow-x: visible;
 
       /* ✅ 꼬리 공간 확보(잘림 방지) */
-      padding: 8px calc(12px + var(--tail-out) + var(--tail-notch)) 18px;
-
+      padding: 8px calc(var(--edge-pad) + var(--tail-out) + var(--tail-notch)) 18px;
+      
       display: flex;
       flex-direction: column;
       gap: 10px;
@@ -199,7 +200,7 @@
       max-width: 100%;
       padding: 10px 12px;
       border-radius: 25px;
-      font-size: 13px;
+      font-size: 12px;
       line-height: 1.32;
       white-space: pre-wrap;
 
@@ -675,6 +676,7 @@
   </script>
 </body>
 </html>
+
 
 
 
